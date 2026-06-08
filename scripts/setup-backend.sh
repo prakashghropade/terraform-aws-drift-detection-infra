@@ -21,7 +21,7 @@ echo "Creating S3 bucket..."
 aws s3api create-bucket \
   --bucket "$BUCKET_NAME" \
   --region "$AWS_REGION" \
-  $(if [ "$AWS_REGION" != "ap-south-1" ]; then echo "--create-bucket-configuration LocationConstraint=$AWS_REGION"; fi)
+  $(if [ "$AWS_REGION" != "us-east-1" ]; then echo "--create-bucket-configuration LocationConstraint=$AWS_REGION"; fi)
 
 # Enable versioning
 echo "Enabling versioning..."
