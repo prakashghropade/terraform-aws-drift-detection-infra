@@ -57,7 +57,7 @@ variable "ami_id" {
 variable "instance_type" {
   description = "The EC2 instance type"
   type        = string
-  default     = "t2.small"
+  default     = "t2.micro" 
 }
 
 variable "desired_capacity" {
