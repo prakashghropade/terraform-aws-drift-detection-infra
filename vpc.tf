@@ -77,7 +77,7 @@ resource "aws_route_table_association" "private" {
 
 resource "aws_nat_gateway" "main" {
     count = var.private_subnet_count
-    allocation_id = aws_eip.main[count.index].index
+    allocation_id = aws_eip.main[count.index].id
     subnet_id = aws_subnet.public[count.index].id
     tags = {
       Name = "nat-gateway-${count.index + 1}"
