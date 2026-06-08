@@ -6,7 +6,7 @@ set -e
 
 # Configuration
 BUCKET_NAME="${1:-terraform-state-$(date +%s)}"
-AWS_REGION="${2:-us-east-1}"
+AWS_REGION="${2:-ap-south-1}" 
 
 echo "=========================================="
 echo "Terraform Backend Setup (S3 Native Locking)"
@@ -17,11 +17,11 @@ echo "Locking: S3 native (Terraform 1.10.0+)"
 echo "========================================="
 
 # Create S3 bucket
-echo "Creating S3 bucket..."
+echo "Creating S3 bucket..." 
 aws s3api create-bucket \
   --bucket "$BUCKET_NAME" \
   --region "$AWS_REGION" \
-  $(if [ "$AWS_REGION" != "us-east-1" ]; then echo "--create-bucket-configuration LocationConstraint=$AWS_REGION"; fi)
+  $(if [ "$AWS_REGION" != "ap-south-1" ]; then echo "--create-bucket-configuration LocationConstraint=$AWS_REGION"; fi)
 
 # Enable versioning
 echo "Enabling versioning..."
