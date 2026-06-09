@@ -47,7 +47,6 @@ variable "availability_zones" {
 }
 
 
-
 variable "ami_id" {
   description = "AMI ID for EC2 instances"
   type        = string
@@ -57,7 +56,7 @@ variable "ami_id" {
 variable "instance_type" {
   description = "The EC2 instance type"
   type        = string
-  default     = "t2.micro" 
+  default     = "t3.micro" 
 }
 
 variable "desired_capacity" {
