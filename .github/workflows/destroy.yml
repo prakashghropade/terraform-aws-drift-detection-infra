@@ -63,7 +63,7 @@ jobs:
         id: destory-plan
         run: |
           echo "Generating the destory plan for the ${{ inputs.environment }}"
-          terraform plan -destroy -no-color > destroy_plan.txt
+          terraform plan -destroy -no-color >> destroy_plan.txt
         continue-on-error: true
 
       - name: Show Destory Plan
