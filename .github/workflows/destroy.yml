@@ -66,10 +66,16 @@ jobs:
           terraform plan -destroy -no-color >> destroy_plan.txt
         continue-on-error: true
 
-      - name: Show Destory Plan
+       - name: Terraform Destroy Plan
+        id: destroy-plan
         run: |
-          echo "Resources to be destroyed"
-          $GITHUB_STEP_SUMMARY
+          echo "📋 Generating destroy plan for ${{ inputs.environment }} environment..."
+          terraform plan -destroy -no-color > destroy_plan.txt
+        continue-on-error: true
+
+      - name: Show Destroy Plan
+        run: |
+          echo "### 🗑️ Resources to be Destroyed" >> $GITHUB_STEP_SUMMARY
           echo "**Environment:** ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "<details>" >> $GITHUB_STEP_SUMMARY
@@ -80,36 +86,36 @@ jobs:
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "</details>" >> $GITHUB_STEP_SUMMARY
 
-      - name: Terraform Destory
-        id: destory
+      - name: Terraform Destroy
+        id: destroy
         run: |
-          echo: "Destorying ${{ inputs.environment }} ...infrastructure"
-          terraform destory -auto-approve -no-color | tee destroy_output.txt
-        continue-on-error: true 
+          echo "🗑️ Destroying ${{ inputs.environment }} infrastructure..."
+          terraform destroy -auto-approve -no-color | tee destroy_output.txt
+        continue-on-error: true
 
-      - name: Create Destory Reports Issue
+      - name: Create Destroy Report Issue 
         if: always()
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: | 
+          script: |
             const fs = require('fs');
             let destroyOutput = '';
             try {
               destroyOutput = fs.readFileSync('destroy_output.txt', 'utf8');
             } catch (e) {
               destroyOutput = 'No output captured';
-            } 
+            }
 
-            const success = '${{ steps.destroy.outcome }}' === "success";
-            const title == success
-              ? 'Infrastructure Destroyed: ${{ inputs.environment }}'
-              : 'Infrastructure Destroy Failed: ${{ inputs.environment }}';
-            
+            const success = '${{ steps.destroy.outcome }}' === 'success';
+            const title = success 
+              ? '✅ Infrastructure Destroyed: ${{ inputs.environment }}'
+              : '❌ Infrastructure Destroy Failed: ${{ inputs.environment }}';
+
             const body = `### Infrastructure Destruction Report
 
             **Environment:** \`${{ inputs.environment }}\`
-            **Status:** ${success ? 'Success' : 'Failed'}
+            **Status:** ${success ? '✅ Success' : '❌ Failed'}
             **Triggered by:** @${{ github.actor }}
             **Workflow Run:** [View Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
@@ -122,7 +128,7 @@ jobs:
 
             </details>
 
-            ${success ? 'All resources have been successfully destroyed.' : 'Some resources may not have been destroyed. Please review the logs and clean up manually if needed.'}`;
+            ${success ? '✅ All resources have been successfully destroyed.' : '⚠️ Some resources may not have been destroyed. Please review the logs and clean up manually if needed.'}`;
 
             await github.rest.issues.create({
               owner: context.repo.owner,
@@ -131,7 +137,7 @@ jobs:
               body: body,
               labels: ['infrastructure', 'destroy', '${{ inputs.environment }}']
             });
-      
+
       - name: Destroy Status
         run: |
           if [ "${{ steps.destroy.outcome }}" = "success" ]; then
@@ -142,7 +148,3 @@ jobs:
             echo "Some resources may still exist. Please check AWS console and logs." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
-            
-
-       
-
