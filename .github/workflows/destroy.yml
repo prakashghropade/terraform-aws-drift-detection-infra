@@ -122,7 +122,7 @@ jobs:
 
             ${success ? '✅ All resources have been successfully destroyed.' : '⚠️ Some resources may not have been destroyed. Please review the logs and clean up manually if needed.'}`;
 
-            await github.rest.issues.create({
+            await github.rest.issues.create({ 
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: title,
