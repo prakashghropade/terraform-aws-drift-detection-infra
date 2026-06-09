@@ -16,8 +16,8 @@ on:
           type: string
 
 permissions:
-  contents:  read
-  issue: write
+  contents: read
+  issues: write
 
 env:
   AWS_REGION: ap-south-1
