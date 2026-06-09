@@ -26,7 +26,7 @@ env:
 jobs:
   terraform_destroy:
     name: "Destroy ${{ inputs.environment }} Infrastructure"
-    runs-on: ubutu-latest
+    runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
 
     steps:
