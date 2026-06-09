@@ -1,19 +1,19 @@
-name: "Terraform Destory"
+name: "Terraform Destroy"
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "environment to Destory (dev or prod)"
+        description: "Environment to destroy (dev or prod)"
         required: true
         type: choice
         options:
           - dev
           - prod
-        confirm_destroy:
-          description: 'Type "Destory" to confirm deletion'
-          required: true
-          type: string
+      confirm_destroy:
+        description: 'Type "DESTROY" to confirm deletion'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -31,42 +31,34 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/Checkout@v4
+        uses: actions/checkout@v4
 
-      - name: Verify Destory Confirmation
+      - name: Verify Destroy Confirmation
         run: |
-          if ["${{inputs.confirm_destroy}}" !== "DESTORY"]; then
-            echo "Error: You must type 'DESTORY' to confirm Infrastructure deletion"
-            echo "This is a safty  measures to prevent accidental destruction"
+          if [[ "${{ inputs.confirm_destroy }}" != "DESTROY" ]]; then
+            echo "Error: You must type 'DESTROY' to confirm infrastructure deletion"
+            echo "This is a safety measure to prevent accidental destruction"
             exit 1
           fi
-          echo "Destory confirmation verified"
-        
-      
+          echo "Destroy confirmation verified"
+
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-        
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-          terraform_wrapper: false 
+          terraform_wrapper: false
 
       - name: Terraform Init
         run: terraform init -backend-config="backend-${{ inputs.environment }}.hcl"
-      
-      - name: Terraform Destory Plan
-        id: destory-plan
-        run: |
-          echo "Generating the destory plan for the ${{ inputs.environment }}"
-          terraform plan -destroy -no-color >> destroy_plan.txt
-        continue-on-error: true
 
-       - name: Terraform Destroy Plan
+      - name: Terraform Destroy Plan
         id: destroy-plan
         run: |
           echo "📋 Generating destroy plan for ${{ inputs.environment }} environment..."
@@ -93,9 +85,9 @@ jobs:
           terraform destroy -auto-approve -no-color | tee destroy_output.txt
         continue-on-error: true
 
-      - name: Create Destroy Report Issue 
+      - name: Create Destroy Report Issue
         if: always()
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -108,7 +100,7 @@ jobs:
             }
 
             const success = '${{ steps.destroy.outcome }}' === 'success';
-            const title = success 
+            const title = success
               ? '✅ Infrastructure Destroyed: ${{ inputs.environment }}'
               : '❌ Infrastructure Destroy Failed: ${{ inputs.environment }}';
 
@@ -141,10 +133,10 @@ jobs:
       - name: Destroy Status
         run: |
           if [ "${{ steps.destroy.outcome }}" = "success" ]; then
-            echo "### Infrastructure Destroyed Successfully" >> $GITHUB_STEP_SUMMARY
+            echo "### ✅ Infrastructure Destroyed Successfully" >> $GITHUB_STEP_SUMMARY
             echo "All resources in the ${{ inputs.environment }} environment have been destroyed." >> $GITHUB_STEP_SUMMARY
           else
-            echo "### Infrastructure Destroy Failed" >> $GITHUB_STEP_SUMMARY
+            echo "### ❌ Infrastructure Destroy Failed" >> $GITHUB_STEP_SUMMARY
             echo "Some resources may still exist. Please check AWS console and logs." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
