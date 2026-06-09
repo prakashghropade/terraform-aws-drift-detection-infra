@@ -44,7 +44,7 @@ jobs:
             ENVIRONMENT="prod"
             echo "environment=prod" >> $GITHUB_OUTPUT
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
-          else
+          else 
             ENVIRONMENT="dev"
             echo "environment=dev" >> $GITHUB_OUTPUT
             echo "ENVIRONMENT=dev" >> $GITHUB_ENV
