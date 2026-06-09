@@ -45,7 +45,7 @@ jobs:
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
           else
             echo "environment=dev"  >> $GITHUB_OUTPUT
-            echo "environment=dev"  >> $GITHUB_ENV
+            echo "ENVIRONMENT=dev"  >> $GITHUB_ENV
           fi
 
           echo "Deploying to: $ENVIRONMENT"
