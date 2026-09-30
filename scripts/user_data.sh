@@ -19,4 +19,4 @@ docker run -d \
   --name django-app \
   --restart always \
   -p 80:8000 \
-  itsbaivab/django-app
+  prakashghorpade/django-app
